@@ -9,3 +9,6 @@
 
 
 **Diagram / video / visual explanation**
+
+
+![Alt text](dgm1.png)
