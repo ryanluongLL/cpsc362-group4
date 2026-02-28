@@ -1,8 +1,8 @@
-###CPSC-362-03 18576 Group 4 Project - Ecommerce Website
-##An online retail platform that offers customers products at undercut prices derived from competitor market values. (ex: Amazon, Walmart) The undercutting marketplace is accessible for purchasing, selling, and browsing products via a website and smartphone app.
+### CPSC-362-03 18576 Group 4 Project - Ecommerce Website
+## An online retail platform that offers customers products at undercut prices derived from competitor market values. (ex: Amazon, Walmart) The undercutting marketplace is accessible for purchasing, selling, and browsing products via a website and smartphone app.
 
-##Project Description
-#Features
+## Project Description
+# Features
 1. Shopping Cart System
 * Tax,Sale,Discount
 * Persistent cart state
@@ -26,5 +26,5 @@
 * Security events log 
 7. Mobile app with all website features
 
-##Product Diagrams
+## Product Diagrams
 ![Diagram 1](dgm1.png “Model for General Use of the Website”)
