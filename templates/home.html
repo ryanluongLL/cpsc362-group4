@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+	</head>
+	<body>
+		<h1>Unnamed Store</h1>
+
+		<p>You made it!</p>
+		<ul>
+        {% for product in product_list %}
+            <li>{{ product.name }}</li>
+            <li>{{ product.asin }}</li>
+	    <p>{{ product.description }}</p>
+    <a href="{% url 'something2' product.asin %}">
+    <img src="{% static '/iphone.jpg' %}" width="500" height="500">
+    </a>
+        {% endfor %}
+    </ul>
+	</body>
+</html>

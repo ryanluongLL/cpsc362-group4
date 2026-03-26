@@ -1,6 +1,6 @@
 MIN_MARGIN = 0.10; # 10% minimum profit margin
 
-def get_competitor_price(upc):
+def get_competitor_price(asin):
     #fake competitor pcies for demo
     #API call later
     fake_competitor_prices = {
@@ -19,11 +19,12 @@ def check_constraints(undercut_price, our_cost):
     margin = (undercut_price - our_cost) / undercut_price
     return margin >= MIN_MARGIN
 
-def run_pricing(product):
+def run_pricing(price):
     #fetch competitor price
-    competitor_price = get_competitor_price(product.upc)
+    #competitor_price = get_competitor_price(product.upc)
 
     #check to see if competitor price is available
+    competitor_price = price
     if competitor_price is None:
         print(f"[LOG] Missing competitor data for {product.name}")
         return None
@@ -32,12 +33,13 @@ def run_pricing(product):
     undercut_price = compute_undercut_price(competitor_price)
 
     #check constraints
-    our_cost = float(product.price)
-    if not check_constraints(undercut_price, our_cost):
-        print(f"[LOG] Pricing exception: constraints not satisfied for {product.name}")
-        print(f"[FLAG] Flagged for admin review")
-        return None
+    #our_cost = float(product.price)
+    our_cost = price
+    #if not check_constraints(undercut_price, our_cost):
+        #print(f"[LOG] Pricing exception: constraints not satisfied for {product.name}")
+        #print(f"[FLAG] Flagged for admin review")
+        #return None
 
     # publish new price
-    print(f"[LOG] New price for {product.name}: ${undercut_price}")
+    #print(f"[LOG] New price for {product.name}: ${undercut_price}")
     return undercut_price
