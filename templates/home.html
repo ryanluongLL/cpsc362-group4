@@ -1,22 +1,65 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-	</head>
-	<body>
-		<h1>Unnamed Store</h1>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Meow Mart</title>
+        <link rel="stylesheet" href="{% static 'styles.css' %}">
+    </head>
+    <body>
+        <main class="shell">
+            <section class="hero">
+                <div class="hero-panel">
+                    <p class="eyebrow">Meow Mart</p>
+                    <h1 class="hero-title">Meow Mart</h1>
+                    <p class="hero-copy">
+                        The online marketplace to get your everyday stray savings!
+                    </p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="#catalog">Browse Products</a>
+                        <a class="btn btn-secondary" href="/admin/">Admin Panel</a>
+                    </div>
+                </div>
+            </section>
 
-		<p>You made it!</p>
-		<ul>
-        {% for product in product_list %}
-            <li>{{ product.name }}</li>
-            <li>{{ product.asin }}</li>
-	    <p>{{ product.description }}</p>
-    <a href="{% url 'something2' product.asin %}">
-    <img src="{% static '/iphone.jpg' %}" width="500" height="500">
-    </a>
-        {% endfor %}
-    </ul>
-	</body>
+            <section id="catalog">
+                <div class="section-head">
+                    <div>
+                        <h2 class="section-title">Product Catalog</h2>
+                        <p class="section-copy">Shop Meow Mart's current products and deals here!</p>
+                    </div>
+                </div>
+
+                <div class="product-grid">
+                    {% for product in products %}
+                        <article class="product-card">
+                            <a href="{% url 'something2' product.upc %}">
+                                <div class="product-media">
+                                    <img src="{% static 'iphone.jpg' %}" alt="{{ product.name }}">
+                                </div>
+                                <div class="product-body">
+                                    <div class="product-meta">
+                                        <span>{{ product.category.name }}</span>
+                                        <span>ASIN {{ product.asin|default:"ASIN Pending" }}</span>
+                                    </div>
+                                    <h3 class="product-name">{{ product.name }}</h3>
+                                    <p class="product-description">{{ product.description|default:"No description yet."|truncatewords:24 }}</p>
+                                    <div class="price-row">
+                                        <span class="price">${{ product.price }}</span>
+                                        <span class="btn btn-secondary">View product</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </article>
+                    {% empty %}
+                        <div class="empty-state">
+                            <h3>No products yet</h3>
+                            <p>Add product items via Django admin. Items appear automatically. </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </body>
 </html>
