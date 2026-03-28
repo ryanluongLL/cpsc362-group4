@@ -1,0 +1,297 @@
+:root {
+/* Controls the color options for the website background, title (highlight) */
+    --bg: #eef6ff;
+    --surface: #ffffff;
+    --text: #222222;
+    --muted: #666666;
+    --accent: #1f6feb;
+    --title-color: #0f4c81;
+    --title-highlight: #cfe4ff;
+    --border: #d9d9d9;
+    --radius-lg: 12px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+.shell {
+    width: min(1100px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 24px 0 40px;
+}
+
+.hero {
+    display: block;
+    margin-bottom: 24px;
+}
+
+.hero-panel,
+.product-card,
+.detail-card,
+.empty-state {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+}
+
+.hero-panel {
+    padding: 24px;
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+/* Changed font for most website titles to contrast the description font  */
+.hero-title,
+.section-title,
+.product-name,
+.detail-title {
+    display: inline-flex;
+    align-items: center;
+    font-family: "Trebuchet MS", sans-serif;
+    color: var(--title-color);
+    background: var(--title-highlight);
+    padding: 8px 14px;
+    border: 2px solid #8eb8e8;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(15, 76, 129, 0.12);
+}
+
+.hero-title {
+    margin: 0;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+}
+
+/* Added a class for the hero-title icon to display the Meow Mart icon  */
+.hero-title-icon {
+    width: clamp(44px, 6vw, 64px);
+    height: clamp(44px, 6vw, 64px);
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.hero-copy {
+    max-width: 42rem;
+    margin: 16px 0 20px;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-secondary {
+    border: 1px solid var(--border);
+    background: #f8f8f8;
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: end;
+    margin-bottom: 18px;
+}
+
+.section-title {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.section-copy {
+    margin: 6px 0 0;
+    color: var(--muted);
+}
+
+.product-grid {
+    /* Grid for the individual product catalog cards on homepage. Adjusting to make smaller */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 320px));
+    justify-content: start;
+    gap: 16px;
+}
+
+.product-card {
+    width: 100%;
+    overflow: hidden;
+}
+
+.product-media {
+    height: 220px;
+    background: #eeeeee;
+}
+
+.product-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-body {
+    padding: 16px;
+}
+
+.product-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.product-name {
+    margin: 12px 0 8px;
+    font-size: 1.25rem;
+}
+
+.product-description {
+    margin: 0 0 18px;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.price {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.detail-layout {
+    /* Keeping the product image and details side by side on the page. */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+}
+
+.detail-section {
+    margin-top: 22px;
+}
+
+.detail-card {
+    padding: 20px;
+}
+
+.detail-media {
+    padding: 0;
+    overflow: hidden;
+}
+
+.detail-media img {
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    object-fit: cover;
+}
+
+.detail-title {
+    margin: 0 0 16px;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+
+.detail-copy,
+.detail-list {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.detail-list {
+    padding: 0;
+    margin: 22px 0 0;
+    list-style: none;
+}
+
+.detail-list li + li {
+    margin-top: 10px;
+}
+
+.empty-state {
+    padding: 28px;
+    text-align: center;
+}
+
+@media (max-width: 860px) {
+    .detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-panel,
+    .detail-card {
+        padding: 18px;
+    }
+
+    .detail-media img {
+        min-height: 320px;
+    }
+}
+.add-to-cart {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.add-to-cart .btn {
+    width: 100%;
+}
+.site-header {
+    width: 100%;
+    background-color: #fff;
+    padding: 10px 20px;
+    text-align: right;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cart-link {
+    font-size: 1rem;
+    text-decoration: none;
+    color: #333;
+}

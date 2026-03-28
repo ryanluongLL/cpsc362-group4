@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% if product %}{{ product.name }}{% else %}Product{% endif %}</title>
+        <link rel="stylesheet" href="{% static 'styles.css' %}">
+	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}">
+    </head>
+    <body>
+        <main class="shell">
+            {% if product %}
+                <a class="btn btn-secondary" href="/">Return to catalog</a>
+                    {% comment %} Column layout for the selected product's details, fallback changed to custom error image {% endcomment %}
+                <section class="detail-layout detail-section">
+                    <div class="detail-card detail-media">
+                        <img src="{% if product.image_url %}{{ product.converted_image_url }}{% else %}{% static 'meowmart_errorWithText.png' %}{% endif %}" alt="{{ product.name }}" onerror="this.onerror=null;this.src='{% static 'meowmart_errorWithText.png' %}';">
+                    </div>
+                    <div class="detail-card">
+                        <p class="eyebrow">{{ product.category.name }}</p>
+                        <h1 class="detail-title">{{ product.name }}</h1>
+                        <div class="price-row">
+                            <span class="price">${{ product.price }}</span>
+                            {% if product.discount_price %}
+                                <span class="btn btn-primary">Sale ${{ product.discount_price }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="detail-copy">
+                            {{ product.description|default:"This product currently doesn't have a description..." }}
+                        </p>
+                        <ul class="detail-list">
+                            <li><strong>ASIN:</strong> {{ product.asin|default:"Not assigned" }}</li>
+                            <li><strong>UPC:</strong> {{ product.upc }}</li>
+                            <li><strong>Popularity Score:</strong> {{ product.popularity }}</li>
+                            <li><strong>Added:</strong> {{ product.created_at|date:"F j, Y" }}</li>
+                        </ul>
+                    </div>
+                </section>
+            {% else %}
+                <section class="empty-state">
+                    <h1>Product was not found</h1>
+                    <p>A product could not be found for UPC {{ view.kwargs.upc }}.</p>
+                    <p><a class="btn btn-primary" href="/">Return home</a></p>
+                </section>
+            {% endif %}
+        </main>
+    </body>
+</html>

@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Shopping Cart - Meow Mart</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        /* Quick styling for buttons */
+        .btn { padding: 4px 8px; margin: 2px; cursor: pointer; }
+        .btn-primary { background-color: #4CAF50; color: white; border: none; }
+        .btn-secondary { background-color: #f44336; color: white; border: none; }
+    </style>
+</head>
+<body>
+    <h1>Your Cart</h1>
+
+    {% if cart_items %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in cart_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.product.price }}</td>
+                    <td>${{ item.item_total }}</td>
+                    <td>
+                        <!-- Decrement quantity -->
+                        <a href="{% url 'remove_from_cart' item.product.id %}" class="btn btn-secondary">-</a>
+
+                        <!-- Increment quantity -->
+                        <a href="{% url 'add_to_cart' item.product.id %}" class="btn btn-primary">+</a>
+
+                        <!-- Optional: manual update -->
+                        
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 50px;">
+                            <button type="submit" name="action" value="update" formaction="?product_id={{ item.product.id }}" class="btn btn-primary">Update</button>
+                        </form>
+
+                        <!-- Remove completely -->
+                        <a href="{% url 'remove_from_cart' item.product.id %}?remove_all=true" class="btn btn-secondary">Remove</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <p><strong>Total Price:</strong> ${{ total_price }}</p>
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}
+
+    <a href="{% url 'home' %}">Continue Shopping</a>
+</body>
+</html>
