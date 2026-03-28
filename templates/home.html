@@ -13,9 +13,13 @@
             <section class="hero">
                 <div class="hero-panel">
                     <p class="eyebrow">Meow Mart</p>
-                    <h1 class="hero-title">Meow Mart</h1>
+                    <h1 class="hero-title">
+                     {% comment %} Added static image for the Meowmart logo/icon, to show up next to the hero title {% endcomment %}
+                        <img class="hero-title-icon" src="{% static 'meowmart_icon2.png' %}" alt="Meow Mart logo">
+                        <span>Meow Mart</span>
+                    </h1>
                     <p class="hero-copy">
-                        The online marketplace to get your everyday stray savings!
+                        The online marketplace that brings you stray savings, everyday!
                     </p>
                     <div class="hero-actions">
                         <a class="btn btn-primary" href="#catalog">Browse Products</a>
@@ -37,7 +41,7 @@
                         <article class="product-card">
                             <a href="{% url 'something2' product.upc %}">
                                 <div class="product-media">
-                                    <img src="{% static 'iphone.jpg' %}" alt="{{ product.name }}">
+                                    <img src="{% if product.image_url %}{{ product.converted_image_url }}{% else %}{% static 'meowmart_errorWithText.png' %}{% endif %}" alt="{{ product.name }}" onerror="this.onerror=null;this.src='{% static 'meowmart_errorWithText.png' %}';">
                                 </div>
                                 <div class="product-body">
                                     <div class="product-meta">

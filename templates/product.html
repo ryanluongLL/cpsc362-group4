@@ -11,10 +11,10 @@
         <main class="shell">
             {% if product %}
                 <a class="btn btn-secondary" href="/">Return to catalog</a>
-                {% comment %}Two-column product detail layout for the selected item.{% endcomment %}
+                    {% comment %} Column layout for the selected product's details, fallback changed to custom error image {% endcomment %}
                 <section class="detail-layout detail-section">
                     <div class="detail-card detail-media">
-                        <img src="{% static 'iphone.jpg' %}" alt="{{ product.name }}">
+                        <img src="{% if product.image_url %}{{ product.converted_image_url }}{% else %}{% static 'meowmart_errorWithText.png' %}{% endif %}" alt="{{ product.name }}" onerror="this.onerror=null;this.src='{% static 'meowmart_errorWithText.png' %}';">
                     </div>
                     <div class="detail-card">
                         <p class="eyebrow">{{ product.category.name }}</p>

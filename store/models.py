@@ -1,8 +1,11 @@
+from urllib.parse import parse_qs, urlparse
+
 from django.db import models
 
 # Create your models here.
 
-# Database table for a product's primary category. Add categories in admin
+# Database table for a product's primary category. Add categories and products in admin.
+# Also has a urlparser to convert pesky Google Drive image links into their direct image links instead of previews. 
 # Only primary categories for now, can add subcategories later if needed
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -55,6 +58,26 @@ class Product(models.Model):
 
     # slug = models.SlugField(unique=True)
     # Use to generate SEO urls, adding later 
+
+    # Converts the Google Drive image links into direct image links for the site embed using urllib (native Python library)
+    def converted_image_url(self):
+        if not self.image_url:
+            return ""
+    # Checks if it's a Google Drive link 
+        parsed_url = urlparse(self.image_url)
+        if "drive.google.com" not in parsed_url.netloc:
+            return self.image_url
+    # Grabbing the ID of the file found in the preview URL, then converts it into direct image URL
+        path_parts = parsed_url.path.strip("/").split("/")
+        if "d" in path_parts:
+            drive_file_id = path_parts[path_parts.index("d") + 1]
+            return f"https://drive.google.com/thumbnail?id={drive_file_id}&sz=w1000"
+
+        drive_ids = parse_qs(parsed_url.query).get("id")
+        if drive_ids:
+            return f"https://drive.google.com/thumbnail?id={drive_ids[0]}&sz=w1000"
+
+        return self.image_url
     
     def __str__(self):
         return self.name 

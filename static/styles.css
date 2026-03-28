@@ -61,10 +61,29 @@ img {
     font-weight: 700;
 }
 
+/* Changed font for most website titles to contrast the description font  */
+.hero-title,
+.section-title,
+.product-name,
+.detail-title {
+    font-family: "Trebuchet MS", sans-serif;
+}
+
 .hero-title {
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     font-size: clamp(2rem, 4vw, 3rem);
     line-height: 1.1;
+}
+
+/* Added a class for the hero-title icon to display the Meow Mart icon  */
+.hero-title-icon {
+    width: clamp(44px, 6vw, 64px);
+    height: clamp(44px, 6vw, 64px);
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 .hero-copy {
@@ -118,18 +137,20 @@ img {
 }
 
 .product-grid {
-    /* Responsive grid for the catalog cards on the homepage. */
+    /* Grid for the individual product catalog cards on homepage. Adjusting to make smaller */
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 320px));
+    justify-content: start;
     gap: 16px;
 }
 
 .product-card {
+    width: 100%;
     overflow: hidden;
 }
 
 .product-media {
-    aspect-ratio: 4 / 3;
+    height: 220px;
     background: #eeeeee;
 }
 
@@ -176,7 +197,7 @@ img {
 }
 
 .detail-layout {
-    /* Keeps the product image and details side by side on wider screens. */
+    /* Keeping the product image and details side by side on the page. */
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 28px;
