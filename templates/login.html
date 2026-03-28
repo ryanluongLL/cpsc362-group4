@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login - Meow Mart</title>
+        <link rel="stylesheet" href="{% static 'styles.css' %}">
+    </head>
+    <body>
+        <main class="shell">
+            <section class="hero">
+                <div class="hero-panel">
+                    <p class="eyebrow">Meow Mart</p>
+                    <h1 class="hero-title">Sign In</h1>
+                    {% if form.errors %}
+                        <p style="color:red;">Invalid username or password.</p>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="text" name="username" placeholder="Username" required><br><br>
+                        <input type="password" name="password" placeholder="Password" required><br><br>
+                        <button class="btn btn-primary" type="submit">Login</button>
+                    </form>
+                    <br>
+                    <a href="/register/">Don't have an account? Register</a>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>
