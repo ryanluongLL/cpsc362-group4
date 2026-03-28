@@ -1,9 +1,12 @@
 :root {
-    --bg: #f4f4f4;
+/* Controls the color options for the website background, title (highlight) */
+    --bg: #eef6ff;
     --surface: #ffffff;
     --text: #222222;
     --muted: #666666;
     --accent: #1f6feb;
+    --title-color: #0f4c81;
+    --title-highlight: #cfe4ff;
     --border: #d9d9d9;
     --radius-lg: 12px;
 }
@@ -66,12 +69,19 @@ img {
 .section-title,
 .product-name,
 .detail-title {
+    display: inline-flex;
+    align-items: center;
     font-family: "Trebuchet MS", sans-serif;
+    color: var(--title-color);
+    background: var(--title-highlight);
+    padding: 8px 14px;
+    border: 2px solid #8eb8e8;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(15, 76, 129, 0.12);
 }
 
 .hero-title {
     margin: 0;
-    display: flex;
     align-items: center;
     gap: 12px;
     font-size: clamp(2rem, 4vw, 3rem);
