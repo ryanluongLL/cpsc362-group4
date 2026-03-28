@@ -66,7 +66,8 @@ class Product(models.Model):
     # Checks if it's a Google Drive link 
         parsed_url = urlparse(self.image_url)
         if "drive.google.com" not in parsed_url.netloc:
-            return self.image_url
+            #return self.image_url
+            return f"/static/{self.image_url}"
     # Grabbing the ID of the file found in the preview URL, then converts it into direct image URL
         path_parts = parsed_url.path.strip("/").split("/")
         if "d" in path_parts:
