@@ -7,7 +7,7 @@
 def review_system() -> None:
     filename = "reviews.txt"                                   # Where any data regarding certified reviews are stored.
 
-    MAX_LENGTH = 100                                           # The constant max length for a user review-text string.
+    MAX_LENGTH = 1000                                           # The constant max length for a user review-text string.
     valid_user: bool = True                                    # User already posted a review, or is just generally invalid.
     name_to_find: str = "*" + input("\nEnter username: ")      # User's username is question.
 
