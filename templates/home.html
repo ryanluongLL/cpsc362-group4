@@ -63,7 +63,7 @@
                 <div class="product-grid">
                     {% for product in products %}
                         <article class="product-card">
-                            <a href="{% url 'something2' product.upc %}">
+                            <a href="{% url 'products' product.upc %}">
                                 <div class="product-media">
                                     <img src="{% if product.image_url %}{{ product.converted_image_url }}{% else %}{% static 'meowmart_errorWithText.png' %}{% endif %}" alt="{{ product.name }}" onerror="this.onerror=null;this.src='{% static 'meowmart_errorWithText.png' %}';">
                                 </div>

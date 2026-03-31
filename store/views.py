@@ -2,11 +2,6 @@ from django.views.generic import ListView
 from .models import Product
 from accounts.models import UserAccount
 
-
-def index(request):
-    return HttpResponse("You've reached the homepage for Meow Mart!")
-
-
 class HomeView(ListView):
     model = Product
     template_name = "home.html"
