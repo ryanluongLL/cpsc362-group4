@@ -1,9 +1,11 @@
-from django.http import HttpResponse
 from django.views.generic import ListView
 from .models import Product
+from accounts.models import UserAccount
+
 
 def index(request):
     return HttpResponse("You've reached the homepage for Meow Mart!")
+
 
 class HomeView(ListView):
     model = Product
@@ -11,8 +13,16 @@ class HomeView(ListView):
     context_object_name = "products"
 
     def get_queryset(self):
-        # Showing the newest products first.
         return Product.objects.select_related("category").order_by("-created_at")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.request.session.get("user_id")
+        context["current_user"] = (
+            UserAccount.objects.filter(id=user_id).first() if user_id else None
+        )
+        return context
+
 
 class ProductView(ListView):
     model = Product

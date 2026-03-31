@@ -274,3 +274,98 @@ img {
         min-height: 320px;
     }
 }
+
+/* navbar for signin-signout part */
+.navbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-inner {
+    width: min(1100px, calc(100% - 32px));
+    margin: 0 auto;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.navbar-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.navbar-auth {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Avatar */
+.avatar-wrapper {
+    position: relative;
+}
+
+.avatar-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-btn:hover {
+    opacity: 0.85;
+}
+
+.avatar-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 44px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+    min-width: 180px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.avatar-dropdown.open {
+    display: block;
+}
+
+.dropdown-username {
+    margin: 0 0 2px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.dropdown-email {
+    margin: 0 0 8px;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.dropdown-item {
+    display: block;
+    padding: 6px 0;
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.dropdown-item:hover {
+    color: var(--accent);
+}

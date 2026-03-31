@@ -9,6 +9,30 @@
 	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}">
     </head>
     <body>
+        <!-- signin-signout part -->
+        <nav class="navbar">
+            <div class="navbar-inner">
+                <div class="navbar-auth">
+                    {% if current_user %}
+                        <div class="avatar-wrapper">
+                            <button class="avatar-btn" onclick="toggleDropdown()">
+                                {{ current_user.username|first|upper }}
+                            </button>
+                            <div class="avatar-dropdown" id="avatarDropdown">
+                                <p class="dropdown-username">{{ current_user.username }}</p>
+                                <p class="dropdown-email">{{ current_user.email }}</p>
+                                <hr>
+                                <a href="/accounts/signout/" class="dropdown-item">Sign Out</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a class="btn btn-secondary" href="/accounts/signin/">Sign In</a>
+                        <a class="btn btn-primary" href="/accounts/signup/">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
         <main class="shell">
             <section class="hero">
                 <div class="hero-panel">
@@ -66,5 +90,21 @@
                 </div>
             </section>
         </main>
+
+        <script>
+            function toggleDropdown() {
+                document.getElementById("avatarDropdown").classList.toggle("open");
+            }
+            document.addEventListener("click", function(e) {
+                if (e.target.closest(".avatar-wrapper")) {
+                    // click was inside the avatar wrapper, do nothing
+                } else {
+                    var dropdown = document.getElementById("avatarDropdown");
+                    if (dropdown) {
+                        dropdown.classList.remove("open");
+                    }
+                }
+            });
+        </script>
     </body>
 </html>
