@@ -1,6 +1,8 @@
 from urllib.parse import parse_qs, urlparse
-
 from django.db import models
+from accounts.models import UserAccount
+
+from django.conf import settings
 
 # Create your models here.
 
@@ -81,5 +83,21 @@ class Product(models.Model):
         return self.image_url
     
     def __str__(self):
-        return self.name 
+        return self.name
 
+# Database for the review system
+class Review(models.Model):
+    # Links each review to a specific user account. Also used cascade so that if user is deleted, so are their reviews.
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    # Stores the rating value and text string.
+    rating = models.IntegerField()
+    text = models.TextField()
+    # Automatically stores when the review was created
+    created_at = models.DateTimeField(auto_now_add=True)
+    # Prevents duplicate reviews by looking at the database.
+    class Meta:
+        unique_together = ('user', 'product')
+    # Defines how the review object appears in admin/debug
+    def __str__(self):
+        return f"{self.user} - {self.product} ({self.rating})"

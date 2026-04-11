@@ -369,3 +369,35 @@ img {
 .dropdown-item:hover {
     color: var(--accent);
 }
+
+/* All the changes needed for visuals related to star rating */
+/* For the stars near the textbox */
+.stars span {
+    cursor: pointer;
+    font-size: 30px;
+    color: gray;
+    pointer-events: auto;
+}
+.stars span.active {
+    color: gold;
+}
+
+
+#leaveReview {
+    position: relative;
+    z-index: 10;
+}
+#starRating {
+    position: relative;
+    z-index: 20;
+}
+
+/* For the stars in review list */
+.star {
+    color: #bbb;
+    font-size: 18px;
+}
+.star.filled {
+    color: gold;
+}
+/* */
