@@ -1,151 +1,185 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% if product %}{{ product.name }}{% else %}Product{% endif %}</title>
-        <link rel="stylesheet" href="{% static 'styles.css' %}">
-	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}">
-    </head>
-    <body>
-        <main class="shell">
-            {% if product %}
-                <a class="btn btn-secondary" href="/">Return to catalog</a>
-                    {% comment %} Column layout for the selected product's details, fallback changed to custom error image {% endcomment %}
-                <section class="detail-layout detail-section">
-                    <div class="detail-card detail-media">
-                        <img src="{% if product.image_url %}{{ product.converted_image_url }}{% else %}{% static 'meowmart_errorWithText.png' %}{% endif %}" alt="{{ product.name }}" onerror="this.onerror=null;this.src='{% static 'meowmart_errorWithText.png' %}';">
-                    </div>
-                    <div class="detail-card">
-                        <p class="eyebrow">{{ product.category.name }}</p>
-                        <h1 class="detail-title">{{ product.name }}</h1>
-                        <div class="price-row">
-                            <span class="price">${{ product.price }}</span>
-                            {% if product.discount_price %}
-                                <span class="btn btn-primary">Sale ${{ product.discount_price }}</span>
-                            {% endif %}
-                        </div>
-                        <p class="detail-copy">
-                            {{ product.description|default:"This product currently doesn't have a description..." }}
-                        </p>
-                        <ul class="detail-list">
-                            <li><strong>ASIN:</strong> {{ product.asin|default:"Not assigned" }}</li>
-                            <li><strong>UPC:</strong> {{ product.upc }}</li>
-                            <li><strong>Popularity Score:</strong> {{ product.popularity }}</li>
-                            <li><strong>Added:</strong> {{ product.created_at|date:"F j, Y" }}</li>
-                        </ul>
-                    </div>
-                     {% comment %} Review button code and display reviews in this div  {% endcomment %}
-                    <div class="detail-card review-panel">
-                        <a class="btn btn-primary" href="javascript:void(0);" onclick="toggleLeaveReview()">
-                            Leave a Review
-                        </a>
-                    {% if messages %}
-                        <div class="message-container">
-                            {% for message in messages %}
-                                <div class="message">{{ message }}</div>
-                            {% endfor %}
-                        </div>
+
+{% block content %}
+
+<main class="shell">
+    {% if product %}
+
+        <a class="btn btn-secondary" href="/">Return to catalog</a>
+
+        <section class="detail-layout detail-section">
+
+            <!-- Product Image -->
+            <div class="detail-card detail-media">
+                <img src="{% if product.image_url %}{{ product.converted_image_url }}{% else %}{% static 'meowmart_errorWithText.png' %}{% endif %}"
+                     alt="{{ product.name }}"
+                     onerror="this.onerror=null;this.src='{% static 'meowmart_errorWithText.png' %}';">
+            </div>
+
+            <!-- Product Info -->
+            <div class="detail-card">
+                <p class="eyebrow">{{ product.category.name }}</p>
+
+                <h1 class="detail-title">{{ product.name }}</h1>
+
+                <div class="price-row">
+                    <span class="price">${{ product.price }}</span>
+
+                    {% if product.discount_price %}
+                        <span class="btn btn-primary">Sale ${{ product.discount_price }}</span>
                     {% endif %}
-                        <div id="leaveReview" style="display: none; margin-top: 20px;">
-                            <form method="POST">
-                                {% csrf_token %}
-                                {% comment %} For storing star value and displaying stars {% endcomment %}
-                                <input type="hidden" name="rating" id="ratingValue" value="0">
-                                <div id="starRating" class="stars">
-                                    <span data-value="1">&#9733;</span>
-                                    <span data-value="2">&#9733;</span>
-                                    <span data-value="3">&#9733;</span>
-                                    <span data-value="4">&#9733;</span>
-                                    <span data-value="5">&#9733;</span>
-                                </div>
-                                {% comment %} The textbox where the user can write review  {% endcomment %}
-                                <textarea
-                                        name="text"
-                                        id="reviewText"
-                                        placeholder="Write your review..."
-                                        style="width: 100%; overflow: hidden; resize: none;"></textarea>
-                                <br>
-                                {% comment %} Sends both types of info to backend  {% endcomment %}
-                                <button type="submit" class="btn btn-primary">
-                                    Submit
-                                </button>
-                            </form>
+
+                    <!-- ✅ ADD TO CART BUTTON -->
+                    <button class="btn btn-secondary"
+                            onclick="addToCart({{ product.id }})">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <p class="detail-copy">
+                    {{ product.description|default:"This product currently doesn't have a description..." }}
+                </p>
+
+                <ul class="detail-list">
+                    <li><strong>ASIN:</strong> {{ product.asin|default:"Not assigned" }}</li>
+                    <li><strong>UPC:</strong> {{ product.upc }}</li>
+                    <li><strong>Popularity Score:</strong> {{ product.popularity }}</li>
+                    <li><strong>Added:</strong> {{ product.created_at|date:"F j, Y" }}</li>
+                </ul>
+            </div>
+
+            <!-- Review Section -->
+            <div class="detail-card review-panel">
+
+                <a class="btn btn-primary"
+                   href="javascript:void(0);"
+                   onclick="toggleLeaveReview()">
+                    Leave a Review
+                </a>
+
+                {% if messages %}
+                    <div class="message-container">
+                        {% for message in messages %}
+                            <div class="message">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div id="leaveReview" style="display: none; margin-top: 20px;">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="rating" id="ratingValue" value="0">
+
+                        <div id="starRating" class="stars">
+                            <span data-value="1">&#9733;</span>
+                            <span data-value="2">&#9733;</span>
+                            <span data-value="3">&#9733;</span>
+                            <span data-value="4">&#9733;</span>
+                            <span data-value="5">&#9733;</span>
                         </div>
-                    </div>
-                 {% comment %} Reviews displayed here  {% endcomment %}
-                    <div class="review-list" style="margin-top: 20px;">
-                        {% if reviews %}
-                            {% for review in reviews %}
-                                <div class="review-card" style="border-bottom: 1px solid #ddd; padding: 10px 0;">
-                                    {% comment %} 1. Reviewer name, 2. Star rating, 3. Reviewer text, 4. Review date  {% endcomment %}
-                                    <div>
-                                        <strong>{{ review.user }}</strong>
-                                    </div>
-                                    <div class="stars-display">
-                                        {% for i in "12345"|make_list %}
-                                            <span class="star {% if forloop.counter <= review.rating %}filled{% endif %}">
-                                                ★
-                                            </span>
-                                        {% endfor %}
-                                    </div>
-                                    <p style="margin: 5px 0;">
-                                        {{ review.text }}
-                                    </p>
-                                    <small style="color: gray;">
-                                        {{ review.created_at|date:"F j, Y - H:i" }}
-                                    </small>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <p>No reviews yet. Be the first to leave one!</p>
-                        {% endif %}
-                    </div>
-                </section>
-            {% else %}
-                <section class="empty-state">
-                    <h1>Product was not found</h1>
-                    <p>A product could not be found for UPC {{ view.kwargs.upc }}.</p>
-                    <p><a class="btn btn-primary" href="/">Return home</a></p>
-                </section>
-            {% endif %}
-        </main>
-        {% comment %} Implements the functionality of the UI the review system uses.   {% endcomment %}
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const container = document.getElementById("starRating");
-                const ratingInput = document.getElementById("ratingValue");
-                if (!container || !ratingInput) return;
-                const stars = container.querySelectorAll("span");
-                stars.forEach(star => {
-                    star.addEventListener("click", function () {
-                        const value = this.dataset.value;
-                        ratingInput.value = value;
-                        stars.forEach(s => s.classList.remove("active"));
-                        for (let i = 0; i < value; i++) {
-                            stars[i].classList.add("active");
-                        }
-                    });
-                });
-                const textarea = document.getElementById("reviewText");
-                if (textarea) {
-                    textarea.addEventListener("input", function () {
-                        this.style.height = "auto";
-                        this.style.height = this.scrollHeight + "px";
-                    });
-                }
-            });
-            {% comment %} The function for hiding/showing everything needed to leave a review   {% endcomment %}
-            function toggleLeaveReview() {
-                const box = document.getElementById("leaveReview");
-                if (!box) return;
-                if (box.style.display === "none" || box.style.display === "") {
-                    box.style.display = "block";
-                } else {
-                    box.style.display = "none";
-                }
+
+                        <textarea
+                                name="text"
+                                id="reviewText"
+                                placeholder="Write your review..."
+                                style="width: 100%; overflow: hidden; resize: none;"></textarea>
+
+                        <br>
+
+                        <button type="submit" class="btn btn-primary">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Review List -->
+            <div class="review-list" style="margin-top: 20px;">
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="review-card" style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+
+                            <div>
+                                <strong>{{ review.user }}</strong>
+                            </div>
+
+                            <div class="stars-display">
+                                {% for i in "12345"|make_list %}
+                                    <span class="star {% if forloop.counter <= review.rating %}filled{% endif %}">
+                                        ★
+                                    </span>
+                                {% endfor %}
+                            </div>
+
+                            <p style="margin: 5px 0;">
+                                {{ review.text }}
+                            </p>
+
+                            <small style="color: gray;">
+                                {{ review.created_at|date:"F j, Y - H:i" }}
+                            </small>
+
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No reviews yet. Be the first to leave one!</p>
+                {% endif %}
+            </div>
+
+        </section>
+
+    {% else %}
+        <section class="empty-state">
+            <h1>Product was not found</h1>
+            <p>A product could not be found for UPC {{ view.kwargs.upc }}.</p>
+            <p><a class="btn btn-primary" href="/">Return home</a></p>
+        </section>
+    {% endif %}
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById("starRating");
+    const ratingInput = document.getElementById("ratingValue");
+
+    if (!container || !ratingInput) return;
+
+    const stars = container.querySelectorAll("span");
+
+    stars.forEach(star => {
+        star.addEventListener("click", function () {
+            const value = this.dataset.value;
+            ratingInput.value = value;
+
+            stars.forEach(s => s.classList.remove("active"));
+            for (let i = 0; i < value; i++) {
+                stars[i].classList.add("active");
             }
-        </script>
-    </body>
-</html>
+        });
+    });
+
+    const textarea = document.getElementById("reviewText");
+    if (textarea) {
+        textarea.addEventListener("input", function () {
+            this.style.height = "auto";
+            this.style.height = this.scrollHeight + "px";
+        });
+    }
+});
+
+function toggleLeaveReview() {
+    const box = document.getElementById("leaveReview");
+    if (!box) return;
+
+    if (box.style.display === "none" || box.style.display === "") {
+        box.style.display = "block";
+    } else {
+        box.style.display = "none";
+    }
+}
+</script>
+
+{% endblock %}

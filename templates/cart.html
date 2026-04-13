@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<main class="shell">
+
+    <h1 class="section-title">Your Cart 🛒</h1>
+
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'home' %}" class="btn btn-secondary">
+            ← Continue Shopping
+        </a>
+    </div>
+
+    {% if products %}
+
+    <div class="cart-container">
+
+        <!-- LEFT: ITEMS -->
+        <div class="cart-items">
+
+            {% for item in products %}
+            <div class="cart-card" id="item-{{ item.product.id }}">
+
+                <img src="{{ item.product.converted_image_url }}"
+                     alt="{{ item.product.name }}"
+                     style="width: 90px; border-radius: 8px;">
+
+                <div class="cart-info">
+
+                    <h3>{{ item.product.name }}</h3>
+
+                    <p class="price">${{ item.product.price }}</p>
+
+                    <!-- QUANTITY CONTROLS -->
+                    <div class="qty-controls">
+
+                        <button onclick="decreaseQty({{ item.product.id }})"
+                                class="qty-btn">−</button>
+
+                        <span id="qty-{{ item.product.id }}">
+                            {{ item.quantity }}
+                        </span>
+
+                        <button onclick="increaseQty({{ item.product.id }})"
+                                class="qty-btn">+</button>
+
+                    </div>
+
+                    <p>
+                        Subtotal:
+                        $<span id="subtotal-{{ item.product.id }}">
+                            {{ item.subtotal }}
+                        </span>
+                    </p>
+
+                    <button onclick="removeItem({{ item.product.id }})"
+                            class="remove-btn">
+                        Remove
+                    </button>
+
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- RIGHT: SUMMARY -->
+        <div class="cart-summary">
+
+            <h2>Order Summary</h2>
+
+            <h3>
+                Total: $
+                <span id="cart-total">{{ total }}</span>
+            </h3>
+
+            <a href="{% url 'checkout' %}" class="btn btn-primary" style="width: 100%;">
+                Proceed to Checkout
+            </a>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <h2>Your cart is empty 🛒</h2>
+            <a href="{% url 'home' %}" class="btn btn-primary">
+                Start Shopping
+            </a>
+        </div>
+
+    {% endif %}
+
+</main>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+function getCSRFToken() {
+    let cookieValue = null;
+
+    document.cookie.split(';').forEach(c => {
+        if (c.trim().startsWith('csrftoken=')) {
+            cookieValue = c.trim().substring(10);
+        }
+    });
+
+    return cookieValue;
+}
+
+function updateCartUI(data) {
+
+    // update total
+    document.getElementById("cart-total").innerText = data.total;
+
+    // update navbar
+    const cartLink = document.getElementById("cart-link");
+    if (cartLink) {
+        cartLink.innerText = `🛒 Cart (${data.cart_count})`;
+    }
+
+    // STEP 1: build set of valid IDs
+    const validIds = new Set(data.items.map(i => String(i.id)));
+
+    // STEP 2: remove missing items from DOM FIRST
+    document.querySelectorAll("[id^='item-']").forEach(el => {
+        const id = el.id.replace("item-", "");
+        if (!validIds.has(id)) {
+            el.remove();
+        }
+    });
+
+    // STEP 3: update remaining items
+    data.items.forEach(item => {
+
+        const qtyEl = document.getElementById(`qty-${item.id}`);
+        const subEl = document.getElementById(`subtotal-${item.id}`);
+
+        if (qtyEl) qtyEl.innerText = item.quantity;
+        if (subEl) subEl.innerText = item.subtotal;
+    });
+
+    // STEP 4: empty cart fallback
+    if (data.items.length === 0) {
+        location.reload(); // clean empty state rendering
+    }
+}
+
+function increaseQty(id) {
+    fetch(`/cart/increase/ajax/${id}/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": getCSRFToken() }
+    })
+    .then(r => r.json())
+    .then(updateCartUI);
+}
+
+function decreaseQty(id) {
+    fetch(`/cart/decrease/ajax/${id}/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": getCSRFToken() }
+    })
+    .then(r => r.json())
+    .then(updateCartUI);
+}
+
+function removeItem(id) {
+    fetch(`/cart/remove/ajax/${id}/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": getCSRFToken() }
+    })
+    .then(r => r.json())
+    .then(updateCartUI);
+}
+</script>
+{% endblock %}
