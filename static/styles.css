@@ -570,3 +570,24 @@ img {
     margin-bottom: 10px;
     font-size: 13px;
 }
+
+/* search bar */
+.search-form{
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.search-input{
+    padding: 0.5rem 1rem;
+    border: 1px solid rgb(204, 204, 204);
+    border-radius: 6px;
+    font-size: 1rem;
+    width: 350px;
+}
+
+.search-input:focus{
+    outline: none;
+    border-color: #000;
+}

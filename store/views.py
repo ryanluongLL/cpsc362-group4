@@ -34,7 +34,13 @@ class HomeView(ListView):
     context_object_name = "products"
 
     def get_queryset(self):
-        return Product.objects.select_related("category").order_by("-created_at")
+        query = self.request.GET.get("q", "").strip()
+        products = Product.objects.select_related("category").order_by("-created_at")
+        if query:
+            products = products.filter(name__icontains=query) | products.filter(
+                category__name__icontains=query
+            )
+        return products
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
