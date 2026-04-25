@@ -101,3 +101,12 @@ class Review(models.Model):
     # Defines how the review object appears in admin/debug
     def __str__(self):
         return f"{self.user} - {self.product} ({self.rating})"
+
+class Favorite(models.Model):
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    product = models.ForeignKey('store.Product', on_delete=models.CASCADE)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    # Prevents duplicate data from being stored.
+    class Meta:
+        unique_together = ('user', 'product')

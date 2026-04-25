@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Favorites</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+<h1>❤️ My Favorites</h1>
+<a href="{% url 'home' %}">Back Home</a>
+<div class="favorites-list">
+    {% for fav in favorites %}
+        <div class="favorite-row">
+            <!-- ACTION BUTTONS (LEFT SIDE) -->
+            <div class="fav-actions">
+                <!-- GO TO PRODUCT PAGE BUTTON -->
+                <a class="btn btn-primary"
+                   href="{% url 'products' fav.product.upc %}">
+                    View
+                </a>
+                <!-- REMOVE FAVORITE BUTTON -->
+                <button class="remove-fav-btn"
+                        data-product-id="{{ fav.product.id }}">
+                    ❌Remove
+                </button>
+            </div>
+            <!-- PRODUCT DISPLAY (NOT CLICKABLE ANYMORE) -->
+            <div class="product-card">
+                <h3>{{ fav.product.name }}</h3>
+                <p>${{ fav.product.price }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p>You don’t have any favorites yet.</p>
+    {% endfor %}
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    console.log("Favorites page JS loaded");
+
+    document.querySelectorAll(".remove-fav-btn").forEach(btn => {
+
+        btn.addEventListener("click", async function () {
+
+            console.log("Remove clicked");
+
+            const productId = this.dataset.productId;
+
+            const response = await fetch(`/favorite/${productId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.favorited === false) {
+                this.closest(".favorite-row").remove();
+            }
+        });
+
+    });
+
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    const cookies = document.cookie.split(";");
+    for (let c of cookies) {
+        c = c.trim();
+        if (c.startsWith(name + "=")) {
+            cookieValue = decodeURIComponent(c.substring(name.length + 1));
+        }
+    }
+    return cookieValue;
+}
+</script>
+</body>
+</html>

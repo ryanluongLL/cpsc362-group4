@@ -401,3 +401,38 @@ img {
     color: gold;
 }
 /* */
+
+.favorite-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+.favorite-btn.active {
+    background-color: #ffe6e6;
+    box-shadow: 0 0 10px red;
+    border: 1px solid red;
+}
+
+.favorite-btn.active #heart {
+    color: red;
+}
+
+.price-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.favorites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.favorites-list .product-card {
+    width: 100%;
+}
