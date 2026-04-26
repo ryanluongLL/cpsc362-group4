@@ -63,31 +63,3 @@ def signin_view(request):
 def signout_view(request):
     request.session.flush()  # Clears everything in the session
     return redirect("/")
-
-
-def profile_view(request):
-    user_id = request.session.get("user_id")
-    if not user_id:
-        return redirect("/accounts/signin/")
-
-    user = UserAccount.objects.filter(id=user_id).first()
-    if not user:
-        return redirect("/accounts/signin/")
-
-    profile = UserProfile.objects.filter(user=user).first()
-
-    if request.method == "POST":
-        profile.first_name = request.POST.get("first_name", "").strip()
-        profile.last_name = request.POST.get("last_name", "").strip()
-        profile.phone_number = request.POST.get("phone_number", "").strip()
-        profile.save()
-        return redirect("/accounts/profile")
-
-    return render(
-        request,
-        "accounts/profile.html",
-        {
-            "user": user,
-            "profile": profile,
-        },
-    )

@@ -24,59 +24,6 @@
         </div>
     </div>
 </section>
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Meow Mart</title>
-        <link rel="stylesheet" href="{% static 'styles.css' %}">
-	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}">
-    </head>
-    <body>
-        <!-- signin-signout part -->
-        <nav class="navbar">
-            <div class="navbar-inner">
-                <div class="navbar-auth">
-                    {% if current_user %}
-                        <div class="avatar-wrapper">
-                            <button class="avatar-btn" onclick="toggleDropdown()">
-                                {{ current_user.username|first|upper }}
-                            </button>
-                            <div class="avatar-dropdown" id="avatarDropdown">
-                                <p class="dropdown-username">{{ current_user.username }}</p>
-                                <p class="dropdown-email">{{ current_user.email }}</p>
-                                <hr>
-                                <a href="/accounts/profile" class="dropdown-item">My Profile</a>
-                                <a href="/accounts/signout/" class="dropdown-item">Sign Out</a>
-                            </div>
-                        </div>
-                    {% else %}
-                        <a class="btn btn-secondary" href="/accounts/signin/">Sign In</a>
-                        <a class="btn btn-primary" href="/accounts/signup/">Sign Up</a>
-                    {% endif %}
-                </div>
-            </div>
-        </nav>
-
-        <main class="shell">
-            <section class="hero">
-                <div class="hero-panel">
-                    <p class="eyebrow">Meow Mart</p>
-                    <h1 class="hero-title">
-                     {% comment %} Added static image for the Meowmart logo/icon, to show up next to the hero title {% endcomment %}
-                        <img class="hero-title-icon" src="{% static 'meowmart_icon2.png' %}" alt="Meow Mart logo">
-                        <span>Meow Mart</span>
-                    </h1>
-                    <p class="hero-copy">
-                        The online marketplace that brings you stray savings, everyday!
-                    </p>
-                    <div class="hero-actions">
-                        <a class="btn btn-primary" href="#catalog">Browse Products</a>
-                        <a class="btn btn-secondary" href="/admin/">Admin Panel</a>
-                    </div>
-                </div>
-            </section>
 
 <section id="catalog">
 
@@ -86,25 +33,6 @@
             <p class="section-copy">Shop Meow Mart's current products and deals here!</p>
         </div>
     </div>
-            <section id="catalog">
-                <div class="section-head">
-                    <div>
-                        <h2 class="section-title">Product Catalog</h2>
-                        <p class="section-copy">Shop Meow Mart's current products and deals here!</p>
-                    </div>
-
-                    <!-- search bar -->
-                     <form method="get" action="/#catalog" class="search-form">
-                        <input 
-                            type="text"
-                            name="q"
-                            placeholder="Search products or categories..."
-                            value="{{query}}"
-                            class="search-input"
-                        >
-                        <button type="submit" class="btn btn-primary">Search</button>
-                     </form>
-                </div>
 
     <div class="product-grid">
 
