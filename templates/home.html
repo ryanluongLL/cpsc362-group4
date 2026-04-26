@@ -3,36 +3,58 @@
 
 {% block content %}
 
-<section class="hero">
-    <div class="hero-panel">
-        <p class="eyebrow">Meow Mart</p>
 
-        <h1 class="hero-title">
-            <img class="hero-title-icon"
-                 src="{% static 'meowmart_icon2.png' %}"
-                 alt="Meow Mart logo">
-            <span>Meow Mart</span>
-        </h1>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Meow Mart</title>
+        <link rel="stylesheet" href="{% static 'styles.css' %}">
+	<link rel="shortcut icon" type="image/png" href="{% static 'favicon.png' %}">
+    </head>
+    <body>        
+        <main class="shell">
+            <section class="hero">
+                <div class="hero-panel">
+                    <p class="eyebrow">Meow Mart</p>
+                    <h1 class="hero-title">
+                     {% comment %} Added static image for the Meowmart logo/icon, to show up next to the hero title {% endcomment %}
+                        <img class="hero-title-icon" src="{% static 'meowmart_icon2.png' %}" alt="Meow Mart logo">
+                        <span>Meow Mart</span>
+                    </h1>
+                    <p class="hero-copy">
+                        The online marketplace that brings you stray savings, everyday!
+                    </p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="#catalog">Browse Products</a>
+                        <a class="btn btn-secondary" href="/admin/">Admin Panel</a>
+                    </div>
+                </div>
+            </section>
 
-        <p class="hero-copy">
-            The online marketplace that brings you stray savings, everyday!
-        </p>
 
-        <div class="hero-actions">
-            <a class="btn btn-primary" href="#catalog">Browse Products</a>
-            <a class="btn btn-secondary" href="/admin/">Admin Panel</a>
-        </div>
-    </div>
-</section>
 
-<section id="catalog">
+   
+            <section id="catalog">
+                <div class="section-head">
+                    <div>
+                        <h2 class="section-title">Product Catalog</h2>
+                        <p class="section-copy">Shop Meow Mart's current products and deals here!</p>
+                    </div>
 
-    <div class="section-head">
-        <div>
-            <h2 class="section-title">Product Catalog</h2>
-            <p class="section-copy">Shop Meow Mart's current products and deals here!</p>
-        </div>
-    </div>
+                    <!-- search bar -->
+                     <form method="get" action="/#catalog" class="search-form">
+                        <input 
+                            type="text"
+                            name="q"
+                            placeholder="Search products or categories..."
+                            value="{{query}}"
+                            class="search-input"
+                        >
+                        <button type="submit" class="btn btn-primary">Search</button>
+                     </form>
+                </div>
 
     <div class="product-grid">
 
@@ -95,6 +117,6 @@
 
     </div>
 
-</section>
+
 
 {% endblock %}
