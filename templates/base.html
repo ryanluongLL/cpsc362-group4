@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meow Mart</title>
+
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}">
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+
+        <!-- LEFT: BRAND -->
+        <div class="navbar-left">
+            <a href="/" class="brand">
+                🐾 Meow Mart
+            </a>
+        </div>
+
+        <!-- RIGHT: ACTIONS -->
+        <div class="navbar-right">
+
+            <a href="{% url 'cart' %}" class="nav-link cart-link">
+                🛒 Cart
+                <span class="cart-badge" id="cart-count">
+                    {{ cart_item_count|default:0 }}
+                </span>
+            </a>
+
+            {% if current_user %}
+
+                <div class="user-menu">
+                    <button class="avatar-btn" onclick="toggleDropdown()">
+                        {{ current_user.username|first|upper }}
+                    </button>
+
+                    <div class="avatar-dropdown" id="avatarDropdown">
+                        <div class="user-info">
+                            <strong>{{ current_user.username }}</strong>
+                            <small>{{ current_user.email }}</small>
+                        </div>
+                        <a href="/accounts/profile/">My Profile</a>
+                        <a href="/accounts/signout/">Sign Out</a>
+                    </div>
+                </div>
+
+            {% else %}
+
+                <a href="/accounts/signin/" class="nav-link">Sign In</a>
+                <a href="/accounts/signup/" class="btn-signup">Sign Up</a>
+
+            {% endif %}
+
+        </div>
+    </div>
+</nav>
+
+<main class="shell">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- =========================
+     TOAST NOTIFICATION
+========================= -->
+<div id="toast" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: black;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    display: none;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+">
+    Cart updated ✓
+</div>
+
+<!-- =========================
+     GLOBAL JS
+========================= -->
+<script>
+function toggleDropdown() {
+    const el = document.getElementById("avatarDropdown");
+    if (el) el.classList.toggle("open");
+}
+
+/* =========================
+   CSRF TOKEN (SAFE VERSION)
+========================= */
+function getCSRFToken() {
+    return document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='))
+        ?.split('=')[1];
+}
+
+/* =========================
+   ADD TO CART
+========================= */
+function addToCart(productId) {
+    fetch(`/cart/add/ajax/${productId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+        },
+    })
+    .then(res => res.json())
+    .then(updateCartUI)
+    .catch(err => {
+        console.error("Add to cart error:", err);
+        alert("Failed to add item to cart.");
+    });
+}
+
+/* =========================
+   REMOVE ITEM
+========================= */
+function removeItem(id) {
+    fetch(`/cart/remove/ajax/${id}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken()
+        }
+    })
+    .then(res => res.json())
+    .then(updateCartUI)
+    .catch(err => {
+        console.error("Remove item error:", err);
+        alert("Failed to remove item.");
+    });
+}
+
+/* =========================
+   INCREASE QTY
+========================= */
+function increaseQty(productId) {
+    fetch(`/cart/increase/ajax/${productId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+        },
+    })
+    .then(res => res.json())
+    .then(updateCartUI)
+    .catch(err => {
+        console.error("Increase qty error:", err);
+    });
+}
+
+/* =========================
+   DECREASE QTY
+========================= */
+function decreaseQty(productId) {
+    fetch(`/cart/decrease/ajax/${productId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+        },
+    })
+    .then(res => res.json())
+    .then(updateCartUI)
+    .catch(err => {
+        console.error("Decrease qty error:", err);
+    });
+}
+
+/* =========================
+   UPDATE UI (SOURCE OF TRUTH)
+========================= */
+function updateCartUI(data) {
+
+    // -------------------------
+    // update cart count
+    // -------------------------
+    const countEl = document.getElementById("cart-count");
+    if (countEl && data.cart_count !== undefined) {
+        countEl.innerText = data.cart_count;
+    }
+
+    // -------------------------
+    // update total
+    // -------------------------
+    const totalEl = document.getElementById("cart-total");
+    if (totalEl && data.total !== undefined) {
+        totalEl.innerText = data.total;
+    }
+
+    // -------------------------
+    // update items (safe sync)
+    // -------------------------
+    if (data.items) {
+
+        // update existing items
+        data.items.forEach(item => {
+
+            const qtyEl = document.getElementById(`qty-${item.id}`);
+            const subEl = document.getElementById(`subtotal-${item.id}`);
+
+            if (qtyEl) qtyEl.innerText = item.quantity;
+            if (subEl) subEl.innerText = item.subtotal;
+        });
+
+        // remove missing items (server is source of truth)
+        document.querySelectorAll("[id^='item-']").forEach(el => {
+            const id = el.id.replace("item-", "");
+            const exists = data.items.find(i => String(i.id) === String(id));
+
+            if (!exists) {
+                el.remove();
+            }
+        });
+
+        // fallback if empty
+        if (data.items.length === 0) {
+            const container = document.getElementById("cart-container");
+            if (container) {
+                location.reload();
+            }
+        }
+    }
+
+    // -------------------------
+    // toast notification
+    // -------------------------
+    const toast = document.getElementById("toast");
+    if (toast) {
+        toast.style.display = "block";
+        toast.style.opacity = "1";
+
+        setTimeout(() => {
+            toast.style.opacity = "0";
+
+            setTimeout(() => {
+                toast.style.display = "none";
+            }, 200);
+
+        }, 2000);
+    }
+}
+</script>
+
+</body>
+</html>
