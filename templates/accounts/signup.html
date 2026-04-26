@@ -1,18 +1,148 @@
 <!DOCTYPE html>
-<html>
-<head><title>Sign Up - Meow Mart</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up - Meow Mart</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #111, #2a2a2a);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            width: 380px;
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 13px;
+            color: #333;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #111;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #333;
+        }
+
+        .error {
+            background: #ffe5e5;
+            color: #b00020;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
 <body>
-  <h2>Create Account</h2>
-  {% if error %}
-    <p style="color:red;">{{ error }}</p>
-  {% endif %}
-  <form method="POST">
-    {% csrf_token %}
-    <label>Username: <input type="text" name="username"></label><br>
-    <label>Email: <input type="email" name="email"></label><br>
-    <label>Password: <input type="password" name="password"></label><br>
-    <button type="submit">Create Account</button>
-  </form>
-  <p>Already have an account? <a href="/accounts/signin/">Sign In</a></p>
+
+<div class="auth-card">
+
+    <div class="logo">🐾 Meow Mart</div>
+    <div class="subtitle">Join the stray savings club</div>
+
+    <h2>Sign Up</h2>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Choose a username">
+
+        <label>Email</label>
+        <input type="email" name="email" placeholder="Enter email">
+
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Create password">
+
+        <button class="btn" type="submit">Create Account</button>
+    </form>
+
+    <div class="footer">
+        Already have an account?
+        <a href="/accounts/signin/">Sign In</a>
+    </div>
+
+</div>
+
 </body>
 </html>

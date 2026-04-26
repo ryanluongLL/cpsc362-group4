@@ -401,3 +401,172 @@ img {
     color: gold;
 }
 /* */
+
+.cart-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.cart-items {
+    flex: 2;
+}
+
+.cart-summary {
+    flex: 1;
+    position: sticky;
+    top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: white;
+}
+
+.cart-card {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background: white;
+    align-items: center;
+}
+
+.cart-info {
+    flex: 1;
+}
+
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.qty-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: #eee;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+
+
+.navbar {
+    background: #111;
+    color: white;
+    padding: 14px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-inner {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* BRAND */
+.brand {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* RIGHT SIDE */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+/* LINKS */
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.nav-link:hover {
+    opacity: 0.7;
+}
+
+/* CART */
+.cart-link {
+    position: relative;
+    font-weight: bold;
+}
+
+.cart-badge {
+    background: red;
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    margin-left: 6px;
+}
+
+/* SIGN UP BUTTON */
+.btn-signup {
+    background: white;
+    color: black;
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-signup:hover {
+    background: #ddd;
+}
+
+/* AVATAR */
+.avatar-btn {
+    background: #333;
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.avatar-dropdown {
+    display: none;
+    position: absolute;
+    right: 20px;
+    top: 60px;
+    background: white;
+    color: black;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    width: 180px;
+}
+
+.avatar-dropdown.open {
+    display: block;
+}
+
+.user-info {
+    margin-bottom: 10px;
+    font-size: 13px;
+}

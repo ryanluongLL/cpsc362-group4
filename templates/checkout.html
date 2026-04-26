@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    .checkout-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+
+    .checkout-card {
+        width: 850px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        padding: 30px;
+    }
+
+    .checkout-title {
+        text-align: center;
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .checkout-subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 25px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 25px;
+    }
+
+    .item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .item-name {
+        font-weight: bold;
+    }
+
+    .summary-box {
+        background: #f7f7f7;
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .total {
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    label {
+        font-size: 13px;
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        outline: none;
+    }
+
+    input:focus {
+        border-color: #000;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        background: black;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .btn:hover {
+        background: #333;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+</style>
+
+<div class="checkout-wrapper">
+
+    <div class="checkout-card">
+
+        <h1 class="checkout-title">🛒 Checkout</h1>
+        <p class="checkout-subtitle">Review your order and complete your purchase</p>
+
+        {% if products %}
+
+        <div class="grid">
+
+            <!-- LEFT: ITEMS -->
+            <div>
+
+                <h3>Order Items</h3>
+
+                {% for item in products %}
+                    <div class="item">
+                        <div class="item-name">
+                            {{ item.product.name }} × {{ item.quantity }}
+                        </div>
+                        <div>
+                            ${{ item.subtotal }}
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            <!-- RIGHT: SUMMARY + FORM -->
+            <div class="summary-box">
+
+                <h3>Shipping Info</h3>
+
+                <form method="POST" action="{% url 'place_order' %}">
+                    {% csrf_token %}
+
+                    <label>Full Name</label>
+                    <input type="text" name="name" required>
+
+                    <label>Address</label>
+                    <input type="text" name="address" required>
+
+                    <label>City</label>
+                    <input type="text" name="city" required>
+
+                    <div class="total">
+                        <span>Total</span>
+                        <span>${{ total }}</span>
+                    </div>
+
+                    <button class="btn" type="submit">
+                        Place Order
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+            <div class="empty">
+                <h3>Your cart is empty 🐾</h3>
+                <p>Add some products before checking out.</p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

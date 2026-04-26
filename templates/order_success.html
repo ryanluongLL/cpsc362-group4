@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    .success-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 60px 20px;
+    }
+
+    .success-card {
+        width: 520px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        padding: 35px;
+        text-align: center;
+    }
+
+    .check-icon {
+        font-size: 60px;
+        margin-bottom: 10px;
+    }
+
+    .title {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        color: #666;
+        margin-bottom: 25px;
+    }
+
+    .order-box {
+        background: #f7f7f7;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        display: inline-block;
+        width: 100%;
+        padding: 12px;
+        background: black;
+        color: white;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .btn:hover {
+        background: #333;
+    }
+
+    .secondary {
+        margin-top: 10px;
+        background: #eee;
+        color: black;
+    }
+
+    .secondary:hover {
+        background: #ddd;
+    }
+</style>
+
+<div class="success-wrapper">
+
+    <div class="success-card">
+
+        <div class="check-icon">🎉</div>
+
+        <h1 class="title">Order Successful!</h1>
+
+        <p class="subtitle">
+            Thank you for shopping with Meow Mart 🐾<br>
+            Your order has been placed successfully.
+        </p>
+
+        <div class="order-box">
+            <strong>Your order is being processed</strong><br>
+            You will receive updates soon.
+        </div>
+
+        <a href="{% url 'home' %}" class="btn">
+            Continue Shopping
+        </a>
+
+        <a href="{% url 'cart' %}" class="btn secondary">
+            View Cart
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,8 +1,32 @@
 from django.views.generic import ListView
-from django.shortcuts import redirect
-from .models import Product, Review
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from decimal import Decimal
+
+from .models import Product, Review, Order, OrderItem
 from accounts.models import UserAccount
-from django.contrib import messages
+
+from .cart import (
+    get_session_cart,
+    session_add,
+    session_remove,
+    session_increase,
+    session_decrease
+)
+
+from .cart_db import (
+    get_user_cart,
+    db_add_item,
+    db_remove_item,
+    db_increase_item,
+    db_decrease_item,
+    merge_session_to_db
+)
+
+
+# =========================================================
+# HOME
+# =========================================================
 
 class HomeView(ListView):
     model = Product
@@ -14,15 +38,16 @@ class HomeView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        product = self.get_queryset().first()
+
         user_id = self.request.session.get("user_id")
-        context["product"] = product
-        # Gets all reviews for the selected product, by order starting from newest.
-        context["reviews"] = Review.objects.filter(product=product).order_by("-created_at")
-        # Gets currently logged-in user
         context["current_user"] = UserAccount.objects.filter(id=user_id).first() if user_id else None
+
         return context
 
+
+# =========================================================
+# PRODUCT DETAIL
+# =========================================================
 
 class ProductView(ListView):
     model = Product
@@ -30,50 +55,313 @@ class ProductView(ListView):
     context_object_name = "products"
 
     def get_queryset(self):
-        # Matching details webpage to the UPC passed in the URL.
-        return Product.objects.select_related("category").filter(upc=self.kwargs["upc"])
+        return Product.objects.filter(upc=self.kwargs["upc"])
 
     def get_context_data(self, **kwargs):
-        # Adds product and review data to template
         context = super().get_context_data(**kwargs)
-        # Retrieves single product object from queryset
+
         product = self.get_queryset().first()
-        # Sends product to template for display, and fetches all reviews for the specific product.
         context["product"] = product
+
         context["reviews"] = Review.objects.filter(product=product).order_by("-created_at")
+
+        user_id = self.request.session.get("user_id")
+        context["current_user"] = UserAccount.objects.filter(id=user_id).first() if user_id else None
+
         return context
 
-    # Handles the user input, when user clicks submit button.
-    def post(self, request, *args, **kwargs):
-        product = self.get_queryset().first()
-        user_id = request.session.get("user_id")
-        # User must be logged in, to be valid.
-        if not user_id:
-            messages.error(request, "You must be logged in to leave a review.")
-            return redirect(request.path)
-        # Retrieves actual user object from database
-        user = UserAccount.objects.filter(id=user_id).first()
-        # Handles invalid or expired session data
-        if not user:
-            messages.error(request, "User session invalid. Please log in again.")
-            return redirect("/accounts/login/")
-        rating = int(request.POST.get("rating", 0))
-        text = request.POST.get("text", "").strip()
-        # User must leave a star rating with thier review.
-        if rating <= 0 or not text:
-            messages.error(request, "Please select a rating and write a review.")
-            return redirect(request.path)
-        # User cannot submit multiple reviews on same product.
-        if Review.objects.filter(user=user, product=product).exists():
-            messages.error(request, "You already reviewed this product.")
-            return redirect(request.path)
-        # Saves the review into database, linking it with relevant information.
-        Review.objects.create(
-            user=user,
-            product=product,
-            rating=request.POST.get("rating"),
-            text=request.POST.get("text")
+
+# =========================================================
+# CART VIEW (UNIFIED DISPLAY ONLY)
+# =========================================================
+
+def cart_view(request):
+    products = []
+    total = Decimal("0.00")
+
+    user_id = request.session.get("user_id")
+
+    # -------------------------
+    # DB CART (LOGGED IN)
+    # -------------------------
+    if user_id:
+        cart = get_user_cart(request)
+
+        if cart:
+            items = cart.items.select_related("product")
+
+            for item in items:
+                subtotal = item.product.price * item.quantity
+                total += subtotal
+
+                products.append({
+                    "product": item.product,
+                    "quantity": item.quantity,
+                    "subtotal": subtotal
+                })
+
+    # -------------------------
+    # SESSION CART (GUEST)
+    # -------------------------
+    else:
+        cart = get_session_cart(request.session)
+
+        for product_id, qty in cart.items():
+            product = Product.objects.filter(id=product_id).first()
+            if not product:
+                continue
+
+            qty = int(qty)
+            subtotal = product.price * qty
+            total += subtotal
+
+            products.append({
+                "product": product,
+                "quantity": qty,
+                "subtotal": subtotal
+            })
+
+    return render(request, "cart.html", {
+        "products": products,
+        "total": total
+    })
+
+
+# =========================================================
+# ADD TO CART
+# =========================================================
+
+def add_to_cart_view(request, product_id):
+    user_id = request.session.get("user_id")
+
+    if user_id:
+        cart = get_user_cart(request)
+        product = get_object_or_404(Product, id=product_id)
+        db_add_item(cart, product)
+    else:
+        session_add(request.session, product_id)
+
+    return redirect(request.META.get("HTTP_REFERER", "cart"))
+
+
+# =========================================================
+# REMOVE FROM CART
+# =========================================================
+
+def remove_from_cart_view(request, product_id):
+    user_id = request.session.get("user_id")
+
+    if user_id:
+        cart = get_user_cart(request)
+        db_remove_item(cart, product_id)
+    else:
+        session_remove(request.session, product_id)
+
+    return redirect("cart")
+
+
+# =========================================================
+# AJAX ADD
+# =========================================================
+
+def add_to_cart_ajax(request, product_id):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid"}, status=400)
+
+    user_id = request.session.get("user_id")
+    product = get_object_or_404(Product, id=product_id)
+
+    if user_id:
+        cart = get_user_cart(request)
+        db_add_item(cart, product)
+
+        total_items = sum(i.quantity for i in cart.items.all())
+        return JsonResponse({"cart_count": total_items})
+
+    session_add(request.session, product_id)
+    return JsonResponse({"cart_count": sum(get_session_cart(request.session).values())})
+
+
+# =========================================================
+# AJAX INCREASE
+# =========================================================
+
+def increase_qty_ajax(request, product_id):
+    if request.session.get("user_id"):
+        cart = get_user_cart(request)
+        db_increase_item(cart, product_id)
+    else:
+        session_increase(request.session, product_id)
+
+    return cart_response(request)
+
+
+# =========================================================
+# AJAX DECREASE
+# =========================================================
+
+def decrease_qty_ajax(request, product_id):
+    if request.session.get("user_id"):
+        cart = get_user_cart(request)
+        db_decrease_item(cart, product_id)
+    else:
+        session_decrease(request.session, product_id)
+
+    return cart_response(request)
+
+
+# =========================================================
+# AJAX REMOVE ITEM
+# =========================================================
+
+def remove_item_ajax(request, product_id):
+    if request.session.get("user_id"):
+        cart = get_user_cart(request)
+        db_remove_item(cart, product_id)
+    else:
+        session_remove(request.session, product_id)
+
+    return cart_response(request)
+
+
+# =========================================================
+# CHECKOUT
+# =========================================================
+
+def checkout_view(request):
+    products = []
+    total = Decimal("0.00")
+
+    user_id = request.session.get("user_id")
+
+    # -------------------------
+    # DB CART (LOGGED IN)
+    # -------------------------
+    if user_id:
+        cart = get_user_cart(request)
+
+        if cart:
+            items = cart.items.select_related("product")
+
+            for item in items:
+                subtotal = item.product.price * item.quantity
+                total += subtotal
+
+                products.append({
+                    "product": item.product,
+                    "quantity": item.quantity,
+                    "subtotal": subtotal
+                })
+
+    # -------------------------
+    # SESSION CART (GUEST)
+    # -------------------------
+    else:
+        cart = get_session_cart(request.session)
+
+        for product_id, qty in cart.items():
+            product = Product.objects.filter(id=product_id).first()
+            if not product:
+                continue
+
+            qty = int(qty)
+            subtotal = product.price * qty
+            total += subtotal
+
+            products.append({
+                "product": product,
+                "quantity": qty,
+                "subtotal": subtotal
+            })
+
+    return render(request, "checkout.html", {
+        "products": products,
+        "total": total
+    })
+
+
+# =========================================================
+# ORDER FLOW
+# =========================================================
+
+def place_order(request):
+    if request.method != "POST":
+        return redirect("checkout")
+
+    user_id = request.session.get("user_id")
+
+    name = request.POST.get("name")
+    address = request.POST.get("address")
+    city = request.POST.get("city")
+
+    if user_id:
+        cart = get_user_cart(request)
+
+        if not cart.items.exists():
+            return redirect("cart")
+
+        order = Order.objects.create(
+            user_id=user_id,
+            name=name,
+            address=address,
+            city=city
         )
 
-        messages.success(request, "Review submitted successfully!")
-        return redirect(request.path)
+        for item in cart.items.select_related("product"):
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.product.price
+            )
+
+        cart.items.all().delete()
+
+    else:
+        request.session["cart"] = {}
+        request.session.modified = True
+
+    return redirect("order_success")
+
+def order_success(request):
+    return render(request, "order_success.html")
+
+
+# =========================================================
+# LOGIN MERGE (CALL ONCE AFTER LOGIN)
+# =========================================================
+
+def merge_after_login(request):
+    merge_session_to_db(request)
+
+
+def cart_response(request):
+    cart = request.session.get("cart", {})
+
+    items = []
+    total = Decimal("0.00")
+    total_items = 0
+
+    for product_id, qty in cart.items():
+        try:
+            product = Product.objects.get(id=int(product_id))
+        except Product.DoesNotExist:
+            continue
+
+        qty = int(qty)
+        subtotal = product.price * qty
+
+        total += subtotal
+        total_items += qty
+
+        items.append({
+            "id": product.id,
+            "quantity": qty,
+            "subtotal": float(subtotal)
+        })
+
+    return JsonResponse({
+        "items": items,
+        "total": float(total),
+        "cart_count": total_items
+    })
