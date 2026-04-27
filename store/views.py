@@ -337,22 +337,56 @@ def merge_after_login(request):
 
 
 def cart_response(request):
-    cart = request.session.get("cart", {})
+    # cart = request.session.get("cart", {})
+    user_id = request.session.get("user_id")
     items = []
     total = Decimal("0.00")
     total_items = 0
-
-    for product_id, qty in cart.items():
-        try:
-            product = Product.objects.get(id=int(product_id))
-        except Product.DoesNotExist:
-            continue
-        qty = int(qty)
-        subtotal = product.price * qty
-        total += subtotal
-        total_items += qty
-        items.append({"id": product.id, "quantity": qty, "subtotal": float(subtotal)})
+    if user_id:
+        # db cart for logged in users
+        cart = get_user_cart(request)
+        if cart:
+            for item in cart.items.select_related("product"):
+                subtotal = item.product.price * item.quantity
+                total += subtotal
+                total_items += item.quantity
+                items.append(
+                    {
+                        "id": item.product.id,
+                        "quantity": item.quantity,
+                        "subtotal": float(subtotal),
+                    }
+                )
+    else:
+        # session cart for guests
+        cart = request.session.get("cart", {})
+        for product_id, qty in cart.items():
+            try:
+                product = Product.objects.get(id=int(product_id))
+            except Product.DoesNotExist:
+                continue
+            qty = int(qty)
+            subtotal = product.price * qty
+            total += subtotal
+            total_items += qty
+            items.append(
+                {"id": product.id, "quantity": qty, "subtotal": float(subtotal)}
+            )
 
     return JsonResponse(
         {"items": items, "total": float(total), "cart_count": total_items}
     )
+    # for product_id, qty in cart.items():
+    #     try:
+    #         product = Product.objects.get(id=int(product_id))
+    #     except Product.DoesNotExist:
+    #         continue
+    #     qty = int(qty)
+    #     subtotal = product.price * qty
+    #     total += subtotal
+    #     total_items += qty
+    #     items.append({"id": product.id, "quantity": qty, "subtotal": float(subtotal)})
+
+    # return JsonResponse(
+    #     {"items": items, "total": float(total), "cart_count": total_items}
+    # )
