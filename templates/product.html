@@ -29,15 +29,31 @@
                 <div class="price-row">
                     <span class="price">${{ product.price }}</span>
 
-                    {% if product.discount_price %}
-                        <span class="btn btn-primary">Sale ${{ product.discount_price }}</span>
-                    {% endif %}
+                    <div class="price-actions">
+                        {% if product.discount_price %}
+                            <span class="btn btn-primary">
+                                Sale ${{ product.discount_price }}
+                            </span>
+                        {% endif %}
 
-                    <!-- ✅ ADD TO CART BUTTON -->
-                    <button class="btn btn-secondary"
-                            onclick="addToCart({{ product.id }})">
-                        Add to Cart
-                    </button>
+                        <!-- Favorite Button -->
+                        <button id="favBtn"
+                                data-product-id="{{ product.id }}"
+                                class="favorite-btn {% if is_favorite %}active{% endif %}">
+                            <span id="heart">
+                                {% if is_favorite %}❤️{% else %}🤍{% endif %}
+                            </span>
+                            <span id="favText">
+                                {% if is_favorite %}Favorited{% else %}Save Favorite{% endif %}
+                            </span>
+                        </button>
+
+                        <!-- Add to Cart Button -->
+                        <button class="btn btn-secondary"
+                                onclick="addToCart({{ product.id }})">
+                            Add to Cart
+                        </button>
+                    </div>
                 </div>
 
                 <p class="detail-copy">
@@ -52,9 +68,8 @@
                 </ul>
             </div>
 
-            <!-- Review Section -->
+            {% comment %} Review button code and display reviews in this div {% endcomment %}
             <div class="detail-card review-panel">
-
                 <a class="btn btn-primary"
                    href="javascript:void(0);"
                    onclick="toggleLeaveReview()">
@@ -84,10 +99,10 @@
                         </div>
 
                         <textarea
-                                name="text"
-                                id="reviewText"
-                                placeholder="Write your review..."
-                                style="width: 100%; overflow: hidden; resize: none;"></textarea>
+                            name="text"
+                            id="reviewText"
+                            placeholder="Write your review..."
+                            style="width: 100%; overflow: hidden; resize: none;"></textarea>
 
                         <br>
 
@@ -96,19 +111,17 @@
                         </button>
                     </form>
                 </div>
-
             </div>
 
-            <!-- Review List -->
+            {% comment %} Reviews displayed here {% endcomment %}
             <div class="review-list" style="margin-top: 20px;">
                 {% if reviews %}
                     {% for review in reviews %}
                         <div class="review-card" style="border-bottom: 1px solid #ddd; padding: 10px 0;">
-
+                            {% comment %} 1. Reviewer name, 2. Star rating, 3. Reviewer text, 4. Review date {% endcomment %}
                             <div>
                                 <strong>{{ review.user }}</strong>
                             </div>
-
                             <div class="stars-display">
                                 {% for i in "12345"|make_list %}
                                     <span class="star {% if forloop.counter <= review.rating %}filled{% endif %}">
@@ -116,15 +129,12 @@
                                     </span>
                                 {% endfor %}
                             </div>
-
                             <p style="margin: 5px 0;">
                                 {{ review.text }}
                             </p>
-
                             <small style="color: gray;">
                                 {{ review.created_at|date:"F j, Y - H:i" }}
                             </small>
-
                         </div>
                     {% endfor %}
                 {% else %}
@@ -143,27 +153,23 @@
     {% endif %}
 </main>
 
+{% comment %} Implements the functionality of the UI the review system uses. {% endcomment %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("starRating");
     const ratingInput = document.getElementById("ratingValue");
-
     if (!container || !ratingInput) return;
-
     const stars = container.querySelectorAll("span");
-
     stars.forEach(star => {
         star.addEventListener("click", function () {
             const value = this.dataset.value;
             ratingInput.value = value;
-
             stars.forEach(s => s.classList.remove("active"));
             for (let i = 0; i < value; i++) {
                 stars[i].classList.add("active");
             }
         });
     });
-
     const textarea = document.getElementById("reviewText");
     if (textarea) {
         textarea.addEventListener("input", function () {
@@ -173,15 +179,64 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+{% comment %} The function for hiding/showing everything needed to leave a review {% endcomment %}
 function toggleLeaveReview() {
     const box = document.getElementById("leaveReview");
     if (!box) return;
-
     if (box.style.display === "none" || box.style.display === "") {
         box.style.display = "block";
     } else {
         box.style.display = "none";
     }
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const btn = document.getElementById("favBtn");
+    const heart = document.getElementById("heart");
+    const text = document.getElementById("favText");
+
+    if (!btn || !heart) return;
+
+    btn.addEventListener("click", async function () {
+        const productId = btn.dataset.productId;
+        if (!productId) {
+            console.error("Missing productId on favorite button");
+            return;
+        }
+        const response = await fetch(`/favorite/${productId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+            }
+        });
+        const data = await response.json();
+        if (data.favorited) {
+            btn.classList.add("active");
+            heart.textContent = "❤️";
+            text.textContent = "Favorited";
+        } else {
+            btn.classList.remove("active");
+            heart.textContent = "🤍";
+            text.textContent = "Save Favorite";
+        }
+    });
+});
+
+// CSRF helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let c of cookies) {
+            c = c.trim();
+            if (c.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(c.substring(name.length + 1));
+            }
+        }
+    }
+    return cookieValue;
 }
 </script>
 

@@ -1,112 +1,76 @@
 from urllib.parse import parse_qs, urlparse
 from django.db import models
 from accounts.models import UserAccount
-
 from django.conf import settings
 
-# Create your models here.
 
-# Database table for a product's primary category. Add categories and products in admin.
-# Also has a urlparser to convert pesky Google Drive image links into their direct image links instead of previews. 
-# Only primary categories for now, can add subcategories later if needed
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categories"
 
-# Database table for products and their attributes. 
-# Comments are present for each line on this table as an example guide for team.
+
 class Product(models.Model):
     name = models.CharField(max_length=250)
-    # Storing product names in text for display and search
-
     description = models.TextField(blank=True)
-    # Storing an optional product description 
-
     upc = models.CharField(max_length=12, unique=True)
-    # Universal Product Code, unique identifier of product across every retailer (candidate key) 
-    # Use to implement Amazon price comparison feature; e.g match UPC to ASIN and return price
-
     asin = models.CharField(max_length=10, unique=True, blank=True, null=True)
-    # Optional Amazon Standard Identification Number (ASIN) for product ID
-    # Use for future Amazon price comparison feature 
-
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    # 10 total digits for dollars, 2 decimals for cents 
-
-    discount_price=models.DecimalField(max_digits=10, decimal_places=2, blank = True, null = True)
-    # Optional discount price for salesmatch function 
-
+    discount_price = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True
+    )
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    # FK relating 'category' to the Category table. Only 1 category per product for the time being
-    # Note that if a category gets deleted, all products of that category will also be deleted 
-
     created_at = models.DateTimeField(auto_now_add=True)
-    # Storing the date each product is created in system, aka added to the site. 
-    # Use to implement sort by newest feature 
-
     popularity = models.PositiveIntegerField(default=0)
-    # Storing how many times a product is purchased to quantify popularity. 
-    # Use to implement sort by popular feature
-
     image_url = models.URLField(blank=True)
-    # Storing URL to image of product. Reliable image host needed
-    # Alternately can install Pillow to directly use images. e.g; image = models.ImageField()
 
-    # slug = models.SlugField(unique=True)
-    # Use to generate SEO urls, adding later 
-
-    # Converts the Google Drive image links into direct image links for the site embed using urllib (native Python library)
     def converted_image_url(self):
         if not self.image_url:
             return ""
-    # Checks if it's a Google Drive link 
         parsed_url = urlparse(self.image_url)
         if "drive.google.com" not in parsed_url.netloc:
-            #return self.image_url
             return f"/static/{self.image_url}"
-    # Grabbing the ID of the file found in the preview URL, then converts it into direct image URL
         path_parts = parsed_url.path.strip("/").split("/")
         if "d" in path_parts:
             drive_file_id = path_parts[path_parts.index("d") + 1]
             return f"https://drive.google.com/thumbnail?id={drive_file_id}&sz=w1000"
-
         drive_ids = parse_qs(parsed_url.query).get("id")
         if drive_ids:
             return f"https://drive.google.com/thumbnail?id={drive_ids[0]}&sz=w1000"
-
         return self.image_url
-    
+
     def __str__(self):
         return self.name
 
-# Database for the review system
+
 class Review(models.Model):
-    # Links each review to a specific user account. Also used cascade so that if user is deleted, so are their reviews.
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    # Stores the rating value and text string.
     rating = models.IntegerField()
     text = models.TextField()
-    # Automatically stores when the review was created
     created_at = models.DateTimeField(auto_now_add=True)
-    # Prevents duplicate reviews by looking at the database.
+
     class Meta:
-        unique_together = ('user', 'product')
-    # Defines how the review object appears in admin/debug
+        unique_together = ("user", "product")
+
     def __str__(self):
         return f"{self.user} - {self.product} ({self.rating})"
-    
 
 
-# --------------------
-# CART
-# --------------------
+class Favorite(models.Model):
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    product = models.ForeignKey("store.Product", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "product")
+
+
 class Cart(models.Model):
     user = models.OneToOneField(UserAccount, on_delete=models.CASCADE)
 
@@ -123,22 +87,20 @@ class CartItem(models.Model):
         return f"{self.product.name} x {self.quantity}"
 
 
-# --------------------
-# ORDER
-# --------------------
 class Order(models.Model):
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100)
+    user = models.ForeignKey(
+        UserAccount, on_delete=models.CASCADE, null=True, blank=True
+    )
+    name = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
-    name = models.CharField(max_length=255, null=True, blank=True)
 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)  
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"
