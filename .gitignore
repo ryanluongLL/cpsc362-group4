@@ -8,3 +8,4 @@ price.mjs
 setprice.py
 node_modules/
 qlite3
+staticfiles/
