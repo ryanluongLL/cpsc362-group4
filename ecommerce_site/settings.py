@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-j&@w4ykx9uxo3(3yd%s6n7ws@*n!^f6uv=5u0$)%e2rql3=2u*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1","18.144.57.242"]
+ALLOWED_HOSTS = ["127.0.0.1","18.144.57.242","meowmart.live","localhost"]
 
 
 # Application definition
