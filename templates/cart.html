@@ -5,7 +5,10 @@
 
 <main class="shell">
 
-    <h1 class="section-title">Your Cart 🛒</h1>
+    <div class="cart-page-head">
+        <img class="cart-page-logo" src="{% static 'meowmart_icon2.png' %}" alt="Meow Mart logo">
+        <h1 class="section-title">Your Cart 🛒</h1>
+    </div>
 
     <div style="margin-bottom: 20px;">
         <a href="{% url 'home' %}" class="btn btn-secondary">

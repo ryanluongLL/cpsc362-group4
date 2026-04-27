@@ -23,7 +23,10 @@ body {
     min-height: 100vh;
     font-family: Arial, Helvetica, sans-serif;
     color: var(--text);
-    background: #f5f7fb;
+    background:
+        radial-gradient(circle at 18% 20%, rgba(167, 243, 208, 0.24), transparent 28%),
+        linear-gradient(135deg, #131921 0%, #2f3d37 48%, #83978d 100%);
+    background-attachment: fixed;
     line-height: 1.5;
 }
 
@@ -745,6 +748,9 @@ img {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding-right: clamp(150px, 22vw, 250px);
     background:
         linear-gradient(90deg, rgba(19, 25, 33, 0.95), rgba(35, 47, 62, 0.78)),
         #232f3e;
@@ -790,6 +796,22 @@ img {
     animation: heroIconFloat 3.8s ease-in-out infinite;
 }
 
+.hero-favicon {
+    position: absolute;
+    right: clamp(22px, 5vw, 58px);
+    top: 50%;
+    width: clamp(86px, 14vw, 150px);
+    height: clamp(86px, 14vw, 150px);
+    object-fit: contain;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.24);
+    border-radius: 30px;
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.24);
+    transform: translateY(-50%) rotate(3deg);
+    animation: heroFaviconFloat 4.5s ease-in-out infinite;
+}
+
 @keyframes heroTitleLift {
     from {
         opacity: 0;
@@ -816,6 +838,15 @@ img {
     }
     50% {
         transform: translateY(-4px);
+    }
+}
+
+@keyframes heroFaviconFloat {
+    0%, 100% {
+        transform: translateY(-50%) rotate(3deg);
+    }
+    50% {
+        transform: translateY(-56%) rotate(-2deg);
     }
 }
 
@@ -989,6 +1020,16 @@ img {
 @media (max-width: 760px) {
     .hero-panel {
         min-height: 210px;
+        padding-right: 18px;
+    }
+
+    .hero-favicon {
+        position: static;
+        width: 76px;
+        height: 76px;
+        margin-top: 18px;
+        transform: none;
+        animation: none;
     }
 
     #catalog {
@@ -1102,4 +1143,128 @@ img {
     border-radius: 10px;
     background: #ffffff;
     box-shadow: 0 4px 12px rgba(31, 41, 55, 0.08);
+}
+
+/* Cart page contrast to match storefront */
+.cart-container {
+    padding: 24px;
+    border: 1px solid #667a70;
+    border-radius: 16px;
+    background: #83978d;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 10px 24px rgba(31, 41, 55, 0.12);
+}
+
+.cart-items {
+    padding: 16px;
+    border: 1px solid #9fb5aa;
+    border-radius: 14px;
+    background: #e3ece7;
+}
+
+.cart-card {
+    border-color: #b8c7bf;
+    background: #f8faf8;
+    box-shadow: 0 5px 14px rgba(31, 41, 55, 0.08);
+}
+
+.cart-card img {
+    background: #f0fdf4;
+    border: 1px solid #c8d3cd;
+    padding: 8px;
+    object-fit: contain;
+}
+
+.cart-info h3 {
+    margin: 0 0 8px;
+    color: #131921;
+    font-family: "Poppins", "Segoe UI", Arial, Helvetica, sans-serif;
+    font-size: 1.05rem;
+}
+
+.cart-summary {
+    border-color: #667a70;
+    background: #131921;
+    color: white;
+    box-shadow: 0 12px 26px rgba(19,25,33,0.22);
+}
+
+.cart-summary h2,
+.cart-summary h3 {
+    margin-top: 0;
+}
+
+.cart-summary .btn-primary {
+    background: var(--market-green);
+    color: white;
+}
+
+.cart-summary .btn-primary:hover {
+    background: var(--market-green-dark);
+}
+
+.qty-controls {
+    width: fit-content;
+    padding: 6px;
+    border: 1px solid #b8c7bf;
+    border-radius: 999px;
+    background: white;
+}
+
+.qty-btn {
+    background: #e3ece7;
+    color: #131921;
+    font-weight: 800;
+}
+
+.qty-btn:hover {
+    background: var(--market-green);
+    color: white;
+}
+
+.remove-btn {
+    color: #b91c1c;
+    font-weight: 800;
+}
+
+.empty-state {
+    background: #e3ece7;
+    border-color: #9fb5aa;
+}
+
+.cart-page-head,
+.product-page-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.cart-page-logo,
+.product-page-logo,
+.success-logo {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+    padding: 7px;
+    border: 1px solid #9fb5aa;
+    border-radius: 16px;
+    background: #f4f7f5;
+    box-shadow: 0 8px 18px rgba(19,25,33,0.18);
+}
+
+.product-page-head {
+    justify-content: flex-start;
+}
+
+.success-logo {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 12px;
+    border-radius: 22px;
+    animation: heroIconFloat 3.8s ease-in-out infinite;
+}
+
+.success-card {
+    border: 1px solid #9fb5aa;
+    background: #f4f7f5 !important;
 }
