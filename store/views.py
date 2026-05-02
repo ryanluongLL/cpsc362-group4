@@ -24,7 +24,6 @@ from .cart_db import (
     merge_session_to_db,
 )
 
-
 # =========================================================
 # HOME
 # =========================================================
@@ -50,6 +49,14 @@ class HomeView(ListView):
         context["current_user"] = (
             UserAccount.objects.filter(id=user_id).first() if user_id else None
         )
+        if user_id:
+            cart = get_user_cart(self.request)
+            context["cart_item_count"] = (
+                sum(i.quantity for i in cart.items.all()) if cart else 0
+            )
+        else:
+            session_cart = get_session_cart(self.request.session)
+            context["cart_item_count"] = sum(session_cart.values())
         return context
 
 
@@ -189,7 +196,18 @@ def cart_view(request):
             total += subtotal
             products.append({"product": product, "quantity": qty, "subtotal": subtotal})
 
-    return render(request, "cart.html", {"products": products, "total": total})
+    return render(
+        request,
+        "cart.html",
+        {
+            "products": products,
+            "total": total,
+            "current_user": (
+                UserAccount.objects.filter(id=user_id).first() if user_id else None
+            ),
+            "cart_item_count": sum(item["quantity"] for item in products),
+        },
+    )
 
 
 # =========================================================
@@ -294,7 +312,18 @@ def checkout_view(request):
             total += subtotal
             products.append({"product": product, "quantity": qty, "subtotal": subtotal})
 
-    return render(request, "checkout.html", {"products": products, "total": total})
+    return render(
+        request,
+        "checkout.html",
+        {
+            "products": products,
+            "total": total,
+            "current_user": (
+                UserAccount.objects.filter(id=user_id).first() if user_id else None
+            ),
+            "cart_item_count": sum(item["quantity"] for item in products),
+        },
+    )
 
 
 def place_order(request):

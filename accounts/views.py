@@ -86,8 +86,5 @@ def profile_view(request):
     return render(
         request,
         "accounts/profile.html",
-        {
-            "user": user,
-            "profile": profile,
-        },
+        {"user": user, "profile": profile, "current_user": user, "cart_item_count": 0},
     )
