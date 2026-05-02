@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.views.generic import ListView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.conf import settings
 from decimal import Decimal
 
 from .models import Product, Review, Favorite, Order, OrderItem
@@ -24,6 +25,8 @@ from .cart_db import (
     merge_session_to_db,
 )
 
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # =========================================================
 # HOME
@@ -283,6 +286,12 @@ def checkout_view(request):
                         "subtotal": subtotal,
                     }
                 )
+
+            intent = stripe.PaymentIntent.create(
+            amount=int(total*100),
+            currency='usd',
+            automatic_payment_methods={'enabled': True},
+            )
     else:
         cart = get_session_cart(request.session)
         for product_id, qty in cart.items():
@@ -294,7 +303,13 @@ def checkout_view(request):
             total += subtotal
             products.append({"product": product, "quantity": qty, "subtotal": subtotal})
 
-    return render(request, "checkout.html", {"products": products, "total": total})
+            intent = stripe.PaymentIntent.create(
+            amount=int(total*100),
+            currency='usd',
+            automatic_payment_methods={'enabled': True},
+            )
+
+    return render(request, "checkout.html", {"products": products, "total": total,"client_secret": intent.client_secret, "pkey": settings.STRIPE_PUBLIC_KEY})
 
 
 def place_order(request):
@@ -357,6 +372,7 @@ def cart_response(request):
                         "subtotal": float(subtotal),
                     }
                 )
+
     else:
         # session cart for guests
         cart = request.session.get("cart", {})

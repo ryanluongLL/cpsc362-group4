@@ -9,3 +9,4 @@ setprice.py
 node_modules/
 qlite3
 staticfiles/
+.DS_Store
