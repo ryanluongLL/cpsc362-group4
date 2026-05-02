@@ -1,69 +1,89 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>My Favorites</title>
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
-</head>
-<body>
-<h1>❤️ My Favorites</h1>
-<a href="{% url 'home' %}">Back Home</a>
-<div class="favorites-list">
-    {% for fav in favorites %}
-        <div class="favorite-row">
-            <!-- ACTION BUTTONS (LEFT SIDE) -->
-            <div class="fav-actions">
-                <!-- GO TO PRODUCT PAGE BUTTON -->
-                <a class="btn btn-primary"
-                   href="{% url 'products' fav.product.upc %}">
-                    View
-                </a>
-                <!-- REMOVE FAVORITE BUTTON -->
-                <button class="remove-fav-btn"
-                        data-product-id="{{ fav.product.id }}">
-                    ❌Remove
-                </button>
-            </div>
-            <!-- PRODUCT DISPLAY (NOT CLICKABLE ANYMORE) -->
-            <div class="product-card">
-                <h3>{{ fav.product.name }}</h3>
-                <p>${{ fav.product.price }}</p>
-            </div>
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-panel">
+        <p class="eyebrow">My Account</p>
+        <h1 class="hero-title">❤️ My Favorites</h1>
+        <p class="hero-copy">Products you've saved for later.</p>
+        <div class="hero-actions">
+            <a class="btn btn-secondary" href="{% url 'home' %}">Back Home</a>
         </div>
-    {% empty %}
-        <p>You don’t have any favorites yet.</p>
-    {% endfor %}
-</div>
+    </div>
+</section>
+
+<section style="margin-top: 24px;">
+    {% if favorites %}
+        <div class="product-grid">
+            {% for fav in favorites %}
+                <article class="product-card">
+
+                    <!-- Product Image -->
+                    <a href="{% url 'products' fav.product.upc %}">
+                        <div class="product-media">
+                            <img
+                                src="{% if fav.product.converted_image_url %}
+                                        {{ fav.product.converted_image_url }}
+                                     {% else %}
+                                        {% static 'meowmart_errorWithText.png' %}
+                                     {% endif %}"
+                                alt="{{ fav.product.name }}"
+                                onerror="this.src='{% static 'meowmart_errorWithText.png' %}'"
+                            >
+                        </div>
+                    </a>
+
+                    <div class="product-body">
+                        <div class="product-meta">
+                            <span>{{ fav.product.category.name }}</span>
+                        </div>
+
+                        <h3 class="product-name">{{ fav.product.name }}</h3>
+
+                        <div class="price-row">
+                            <span class="price">${{ fav.product.price }}</span>
+                            <a class="btn btn-primary"
+                               href="{% url 'products' fav.product.upc %}">
+                                View
+                            </a>
+                            <button class="remove-fav-btn btn btn-secondary"
+                                    data-product-id="{{ fav.product.id }}">
+                                ❌ Remove
+                            </button>
+                        </div>
+                    </div>
+
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No favorites yet</h3>
+            <p>Browse products and click the heart button to save them here.</p>
+            <a class="btn btn-primary" href="{% url 'home' %}">Start Browsing</a>
+        </div>
+    {% endif %}
+</section>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
-    console.log("Favorites page JS loaded");
-
     document.querySelectorAll(".remove-fav-btn").forEach(btn => {
-
         btn.addEventListener("click", async function () {
-
-            console.log("Remove clicked");
-
             const productId = this.dataset.productId;
-
             const response = await fetch(`/favorite/${productId}/`, {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": getCookie("csrftoken"),
                 }
             });
-
             const data = await response.json();
-
             if (data.favorited === false) {
-                this.closest(".favorite-row").remove();
+                this.closest("article").remove();
             }
         });
-
     });
-
 });
 
 function getCookie(name) {
@@ -78,5 +98,5 @@ function getCookie(name) {
     return cookieValue;
 }
 </script>
-</body>
-</html>
+
+{% endblock %}

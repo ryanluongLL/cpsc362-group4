@@ -160,6 +160,21 @@ class FavoritesView(ListView):
         user_id = self.request.session.get("user_id")
         return Favorite.objects.select_related("product").filter(user_id=user_id)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = self.request.session.get("user_id")
+        context["current_user"] = (
+            UserAccount.objects.filter(id=user_id).first() if user_id else None
+        )
+        if user_id:
+            cart = get_user_cart(self.request)
+            context["cart_item_count"] = (
+                sum(i.quantity for i in cart.items.all()) if cart else 0
+            )
+        else:
+            context["cart_item_count"] = 0
+        return context
+
 
 # =========================================================
 # CART VIEW
